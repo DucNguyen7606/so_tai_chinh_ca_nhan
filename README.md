@@ -13,11 +13,11 @@
 - `electron/` – mã đóng gói Electron (`main.js`, `preload.js`, `package.json`) và file app đã build sạch (không có dữ liệu cá nhân)
 - `src/so-tai-chinh.html` – mã nguồn giao diện
 - `src/build/` – script build chèn LocalDB và màn khoá vào file HTML
-- `docs/HUONG-DAN.txt` – hướng dẫn cài đặt
+- [`docs/HUONG-DAN.md`](docs/HUONG-DAN.md) – hướng dẫn cài đặt, cập nhật và sử dụng
 
 ## Build
 ```
 cd electron
 npm install
-npx electron-builder --win dir
+npm run build
 ```
