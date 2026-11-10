@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.asar
+so-tai-chinh-data.json
+sao-luu/
+data-dir.txt
+live2/
+plain.json

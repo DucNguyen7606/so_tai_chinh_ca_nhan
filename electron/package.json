@@ -1,0 +1,23 @@
+{
+  "name": "so-thu-chi-dau-tu",
+  "productName": "So Thu Chi Dau Tu",
+  "version": "1.0.0",
+  "description": "Sổ Thu Chi & Đầu Tư",
+  "author": "Nguyen Duy Duc",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win dir"
+  },
+  "build": {
+    "appId": "com.ducnguyen.sothuchi",
+    "productName": "So Thu Chi Dau Tu",
+    "directories": { "output": "out" },
+    "files": ["main.js", "preload.js", "so-tai-chinh.html", "meo-icon.ico"],
+    "win": { "target": "dir", "icon": "meo-icon.ico" }
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

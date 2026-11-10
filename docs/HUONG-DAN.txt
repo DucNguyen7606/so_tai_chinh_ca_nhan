@@ -1,0 +1,25 @@
+SỔ THU CHI & ĐẦU TƯ - HƯỚNG DẪN
+
+MỞ APP
+- Giải nén file .zip ra một thư mục cố định (ví dụ D:\SoThuChi), đừng chạy thẳng trong file nén.
+- Bấm đúp "So Thu Chi Dau Tu.exe".
+- Lần đầu Windows có thể cảnh báo vì phần mềm chưa ký số: bấm "More info" > "Run anyway".
+- Muốn có biểu tượng ngoài Desktop: chuột phải vào "So Thu Chi Dau Tu.exe" > Send to > Desktop (create shortcut).
+- App chạy hoàn toàn trên máy, không cần mạng, không gửi dữ liệu đi đâu.
+
+MẬT KHẨU
+- Lần đầu mở app sẽ yêu cầu tạo mật khẩu. Dữ liệu được mã hoá (AES-256).
+- QUÊN MẬT KHẨU = KHÔNG MỞ LẠI ĐƯỢC DỮ LIỆU. Hãy ghi mật khẩu ở nơi an toàn.
+- Đổi mật khẩu / khoá app: nút 💾 trong app.
+
+DỮ LIỆU
+- so-tai-chinh-data.json (nằm cạnh file .exe): toàn bộ dữ liệu, tự lưu sau mỗi thay đổi.
+- sao-luu\ : mỗi ngày tự giữ 1 bản sao (30 ngày gần nhất).
+- Nút 💾 trong app: mở thư mục dữ liệu, xuất bản sao lưu, nhập lại từ bản sao lưu.
+- Chuyển sang máy khác: chép nguyên thư mục sang máy mới.
+
+BẮT ĐẦU NHANH
+1. Ngân sách: nhập thu, chi dự kiến của tháng, rồi chia Thặng dư vào Tiết kiệm và Đầu tư.
+2. Quỹ tiết kiệm: tạo quỹ khẩn cấp và các quỹ mục tiêu; đặt 📌 Cố định / 🌿 Linh hoạt.
+3. Quỹ đầu tư: thêm khoản đầu tư, nhập mục tiêu, hạn và lợi nhuận %/năm.
+4. Thu chi: ghi từng khoản hằng ngày (gõ 50k, 1.5tr...).
