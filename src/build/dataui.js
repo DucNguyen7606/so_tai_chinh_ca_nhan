@@ -12,11 +12,12 @@ function renderDataUI(st){
       <div class="stack">
         <button data-act="lock">🔒 Khoá app ngay</button>
         <button data-act="passwd">Đổi mật khẩu</button>
+        <button data-act="recovery">${LocalDB.hasRecovery()?"Đổi câu hỏi bảo mật (họ tên, ngày sinh)":"⚠️ Cài câu hỏi bảo mật để khôi phục mật khẩu"}</button>
         <button data-act="folder">Mở thư mục dữ liệu</button>
         <button data-act="download">Xuất bản sao lưu…</button>
         <label class="btn" style="text-align:center">Nhập từ bản sao lưu…<input id="impFile" type="file" accept=".json,application/json" hidden></label>
       </div>
-      <div class="hint">🔐 File dữ liệu và bản sao lưu đều được mã hoá bằng mật khẩu của bạn (AES-256). Mỗi thay đổi tự ghi vào file sau nửa giây. Mỗi ngày app tự giữ một bản sao trong thư mục <b>sao-luu</b> (30 ngày gần nhất).</div>`;
+      <div class="hint">🔐 File dữ liệu và bản sao lưu đều được mã hoá bằng mật khẩu của bạn (AES-256). Quên mật khẩu thì bấm "Quên mật khẩu?" ở màn khoá và trả lời bằng họ tên, ngày sinh. Mỗi thay đổi tự ghi vào file sau nửa giây. Mỗi ngày app tự giữ một bản sao trong thư mục <b>sao-luu</b> (30 ngày gần nhất).</div>`;
     return;
   }
   setSync(st.fileState==="ok"? `đã lưu vào file lúc ${fmtTime(st.fileSavedAt).split(" ")[0]}` : "đã lưu trong trình duyệt");
@@ -58,6 +59,7 @@ document.addEventListener("click",async e=>{
     else if(a==="download"){ const r=await LocalDB.download(); if(r!==false) toast("Đã lưu bản sao lưu"); }
     else if(a==="folder"){ await LocalDB.openFolder(); }
     else if(a==="lock"){ location.reload(); return; }
+    else if(a==="recovery"){ $("#dataDlg").close?.(); if(await LocalDB.changeRecovery()) toast("Đã lưu câu hỏi bảo mật"); return; }
     else if(a==="passwd"){ $("#dataDlg").close?.(); if(await LocalDB.changePassword()) toast("Đã đổi mật khẩu"); return; }
   }catch(err){ if(err&&err.name==="AbortError") return; console.warn(err); toast(err.message||"Không thực hiện được"); }
   renderDataUI(LocalDB.info());

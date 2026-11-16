@@ -1,5 +1,13 @@
 # Lịch sử thay đổi
 
+## 1.1.0 (16/11/2026)
+
+### Bảo mật
+- Quên mật khẩu: khôi phục bằng câu hỏi bảo mật (họ tên đầy đủ + ngày sinh), sau đó đặt mật khẩu mới.
+- Màn đặt mật khẩu hỏi thêm họ tên và ngày sinh.
+- File dữ liệu định dạng mới (v3): dữ liệu mã hoá bằng khoá ngẫu nhiên, khoá được bọc bằng mật khẩu và bằng câu hỏi bảo mật. File cũ được tự nâng cấp khi cài câu hỏi bảo mật.
+- Nút đổi câu hỏi bảo mật trong hộp Dữ liệu.
+
 ## 1.0.0 (11/2026)
 
 ### Thu chi

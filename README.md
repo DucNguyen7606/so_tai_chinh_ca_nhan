@@ -70,9 +70,12 @@ Hào quang vàng, đồng xu bay vào túi 💰, lì xì và cỏ bốn lá, câ
 | Mã hoá | PBKDF2 + AES-256-GCM, khoá bằng mật khẩu bạn đặt |
 | Nơi lưu | `so-tai-chinh-data.json` cạnh app, ghi an toàn (file tạm rồi đổi tên) |
 | Sao lưu | Tự động mỗi ngày vào `sao-luu/`, giữ 30 bản gần nhất |
+| Quên mật khẩu | Khôi phục bằng câu hỏi bảo mật (họ tên đầy đủ + ngày sinh), rồi đặt mật khẩu mới |
 | Mạng | Không gửi dữ liệu đi đâu; link ngoài chỉ mở trong trình duyệt khi bạn bấm |
 
-> ⚠️ Quên mật khẩu là không mở lại được dữ liệu. Hãy ghi mật khẩu ở nơi an toàn.
+> 🔑 Quên mật khẩu? Bấm **"Quên mật khẩu?"** ở màn khoá, nhập họ tên đầy đủ và ngày sinh đã khai khi đặt mật khẩu, rồi đặt mật khẩu mới. Dữ liệu được mã hoá bằng một khoá ngẫu nhiên, khoá này được bọc hai lần: một lần bằng mật khẩu, một lần bằng họ tên + ngày sinh.
+>
+> ⚠️ Ai biết họ tên và ngày sinh của bạn và có file dữ liệu thì cũng mở được. Hãy giữ file dữ liệu ở máy của bạn.
 
 <p align="center"><img src="docs/images/khoa.png" width="600" alt="Màn hình khoá"></p>
 

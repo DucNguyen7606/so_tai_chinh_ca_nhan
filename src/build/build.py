@@ -25,6 +25,10 @@ rep('</style>\n\n<div id="bgfx"','''.data-dlg{border:0;border-radius:20px;paddin
 .lock-card h2{justify-content:center}
 .lock-card input{text-align:center;font-size:1.05rem;padding:11px}
 .lock-err{min-height:1.2em;color:var(--bad);font-size:.85rem;font-weight:600}
+.lock-l{display:grid;gap:4px;text-align:left;font-size:.82rem;font-weight:600;color:var(--muted)}
+.lock-l input{text-align:left;font-size:1rem;color:var(--fg)}
+.lock-sec{font-size:.8rem;font-weight:700;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px;margin-top:2px}
+.lock-link{background:none;border:0;box-shadow:none;color:var(--acc);font-weight:600;padding:4px;text-decoration:underline;cursor:pointer}
 #fileBanner{display:flex;gap:10px 14px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:var(--fg);background:color-mix(in srgb,var(--sky) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--sky) 35%,var(--line));border-style:solid}
 </style>
 </head>

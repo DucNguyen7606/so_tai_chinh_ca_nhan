@@ -31,7 +31,11 @@ Dữ liệu nằm ngoài `app.asar`, nên cập nhật không làm mất dữ li
 ## 3. Mật khẩu
 
 - Lần đầu mở app sẽ yêu cầu tạo mật khẩu. Dữ liệu được mã hoá AES-256 (PBKDF2 + AES-GCM).
-- **Quên mật khẩu là không mở lại được dữ liệu.** Hãy ghi mật khẩu ở nơi an toàn.
+- Khi đặt mật khẩu, app hỏi thêm **họ tên đầy đủ** và **ngày sinh** làm câu hỏi bảo mật.
+- **Quên mật khẩu**: ở màn khoá bấm "Quên mật khẩu?", nhập họ tên và ngày sinh (không phân biệt dấu, chữ hoa, khoảng trắng), rồi đặt mật khẩu mới. Dữ liệu giữ nguyên.
+- Dữ liệu tạo từ bản cũ: lần đầu mở bằng bản mới, app mời cài câu hỏi bảo mật (có thể bấm "Để sau"). Chưa cài thì quên mật khẩu sẽ không mở lại được.
+- Đổi câu hỏi bảo mật: nút 💾 > "Đổi câu hỏi bảo mật".
+- Lưu ý: ai biết họ tên, ngày sinh của bạn và có file dữ liệu cũng mở được, nên đừng chia sẻ file dữ liệu.
 - Đổi mật khẩu hoặc khoá app: nút 💾 trong app.
 
 ## 4. Dữ liệu và sao lưu
