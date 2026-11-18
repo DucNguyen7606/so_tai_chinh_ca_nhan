@@ -3,6 +3,9 @@ const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require("electron")
 const path = require("path");
 const fs = require("fs");
 
+// Hiển thị ngày theo định dạng Việt Nam (dd/mm/yyyy) trong các ô chọn ngày của app
+app.commandLine.appendSwitch("lang", "vi-VN");
+
 const EXE_DIR = path.dirname(process.execPath);
 function resolveDataDir() {
   try {

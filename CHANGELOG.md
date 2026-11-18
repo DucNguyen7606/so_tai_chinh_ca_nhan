@@ -1,5 +1,10 @@
 # Lịch sử thay đổi
 
+## 1.1.1 (18/11/2026)
+
+### Giao diện
+- Tất cả các ô chọn ngày trong app (thu chi, quỹ, đầu tư, kế hoạch, số dư) hiển thị theo định dạng ngày/tháng/năm (dd/mm/yyyy) thay vì tháng/ngày/năm. Dữ liệu lưu không đổi.
+
 ## 1.1.0 (16/11/2026)
 
 ### Bảo mật
