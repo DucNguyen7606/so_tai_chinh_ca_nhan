@@ -410,6 +410,14 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--a
 .fund-actions{display:flex;gap:4px;align-items:center}
 .bar .mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--fg);border-radius:1px}
 details.edit{border-top:1px solid var(--line);padding-top:10px}
+.vndate{position:relative;display:block;width:100%}
+.vndate>input[type="date"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;margin:0;padding:0;border:0}
+.vndate>.vndate-t{position:relative;z-index:1;width:100%;padding-right:36px}
+.vndate>.vndate-b{position:absolute;z-index:2;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;box-shadow:none;cursor:pointer;font-size:1.05rem;line-height:1;padding:2px;width:auto;min-width:0}
+.vndate>.vndate-t.bad{border-color:var(--bad);color:var(--bad)}
+.fund .blk{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px;background:color-mix(in srgb,var(--line) 9%,transparent)}
+.fund .blk>.blk-h{font-weight:700;font-size:.9rem;color:var(--fg);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.fund details.edit,.fund details[data-hist-box]{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:12px;background:color-mix(in srgb,var(--line) 9%,transparent)}
 /* ===== Giao diện "Mèo động lực" ===== */
 body{margin:0;background:
   radial-gradient(900px 500px at 100% -10%,color-mix(in srgb,var(--acc-2) 14%,transparent),transparent 60%),
@@ -872,6 +880,7 @@ function fundCalc(f){
 }
 
 /* ---------- cân đối quỹ tiết kiệm ---------- */
+const FIXED_MAX = 3;
 const isFixed = f => (f.priority ?? (f.kind==="emergency"?"fixed":"flex")) === "fixed";
 function monthsToReach(bal,target,rate,pmt){ // góp đầu tháng, số tháng tối thiểu để đạt mục tiêu
   if(bal>=target) return 0; if(pmt<=0) return Infinity;
@@ -1472,12 +1481,13 @@ function fundCard(f,c){
         <div class="full row"><button type="button" class="danger" data-del-fund="${id}">Xóa quỹ</button><div class="row" style="gap:6px"><button type="button" data-edit-fund="${id}">Hủy</button><button class="primary" type="submit">Lưu thay đổi</button></div></div>
       </form>
     </details>
+    <div class="blk"><div class="blk-h">➕ Góp thêm vào quỹ</div>
     <form class="form" data-dep-form="${id}" autocomplete="off">
       <label class="f">${L("Góp thêm","money")}<input name="amt" data-money inputmode="decimal" placeholder="${compact(c.need)||"500k"}" required></label>
       <label class="f">Ngày<input name="date" type="date" value="${iso(today)}" required></label>
       <label class="f full" style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" name="log" checked style="width:auto"> Ghi vào Thu chi (Tiết kiệm/Đầu tư)${T("fLog")}</label>
       <div class="full"><button class="primary" type="submit">Ghi khoản góp</button></div>
-    </form>
+    </form></div>
     <details data-hist-box="${id}" ${S.openHist.has(f.id)?"open":""}><summary>Lịch sử góp (${c.deps.length})</summary>
       ${c.deps.length? `<table><tbody>${[...c.deps].reverse().map(d=>`<tr><td class="num">${dmy(d.date)}</td><td class="r num">${vn(d.amount)}</td><td class="r"><button class="ghost" data-del-dep="${id}|${esc(d.id||d.date+"|"+d.amount)}">Xóa</button></td></tr>`).join("")}</tbody></table>` : `<div class="empty">Chưa góp lần nào.</div>`}
     </details>
@@ -1545,18 +1555,20 @@ function invCard(v,c){
         <div class="full row"><button type="button" class="danger" data-del-inv="${id}">Xóa khoản đầu tư</button><div class="row" style="gap:6px"><button type="button" data-edit-inv="${id}">Hủy</button><button class="primary" type="submit">Lưu thay đổi</button></div></div>
       </form>
     </details>
+    <div class="blk"><div class="blk-h">➕ Góp thêm vào khoản này</div>
     <form class="form" data-inv-dep-form="${id}" autocomplete="off">
       <label class="f">${L("Góp thêm","money")}<input name="amt" data-money inputmode="decimal" required></label>
       <label class="f">Ngày<input name="date" type="date" value="${iso(today)}" required></label>
       ${isGold(v)?`<label class="f">${L("Số chỉ mua được","goldDepQty")}<input name="qty" inputmode="decimal" placeholder="${v.goldSell?"tự tính theo giá bán ra":"vd 0,5"}"></label>`:""}
       <label class="f full" style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" name="log" checked style="width:auto"> Ghi vào Thu chi (Đầu tư)${T("vLog")}</label>
       <div class="full"><button class="primary" type="submit">Ghi khoản góp</button></div>
-    </form>
+    </form></div>
+    <div class="blk"><div class="blk-h">📈 Cập nhật giá trị hiện tại</div>
     <form class="form" data-inv-val-form="${id}" autocomplete="off">
       <label class="f">${L("Giá trị hiện tại","vVal")}<input name="val" data-money inputmode="decimal" placeholder="${vn(c.value)}" required></label>
       <label class="f">Ngày<input name="date" type="date" value="${iso(today)}" required></label>
       <div class="full"><button type="submit">Cập nhật giá trị</button></div>
-    </form>
+    </form></div>
     <details data-hist-box="${id}" ${S.openHist.has(v.id)?"open":""}><summary>Lịch sử (${c.deps.length} lần góp, ${c.vals.length} lần cập nhật)</summary>
       ${c.deps.length||c.vals.length? `<table><tbody>${[...c.deps.map(d=>({...d,k:"dep"})),...c.vals.map(d=>({...d,k:"val"}))].sort((a,b)=>a.date<b.date?1:-1).map(d=>`<tr><td class="num">${dmy(d.date)}</td><td>${d.k==="dep"?"Góp":"Giá trị"}</td><td class="r num">${vn(d.k==="dep"?d.amount:d.value)}</td><td class="r"><button class="ghost" data-del-invrec="${id}|${d.k}|${esc(d.id)}">Xóa</button></td></tr>`).join("")}</tbody></table>` : `<div class="empty">Chưa có lần góp nào.</div>`}
     </details>
@@ -1769,6 +1781,27 @@ function upd(id,cfg,full){
 
 /* ---------- điều hướng ---------- */
 const VIEWS={tongquan:vTongquan,thuchi:vThuchi,ngansach:vNgansach,quy:vQuy,kehoach:vKehoach,mophong:vMophong};
+/* ---------- ô chọn ngày: luôn hiển thị dd/mm/yyyy, không phụ thuộc máy ---------- */
+function enhanceDates(){
+  document.querySelectorAll('input[type="date"]').forEach(function(D){
+    if(D.__vnd) return; D.__vnd=1;
+    var wrap=document.createElement('span'); wrap.className='vndate';
+    D.parentNode.insertBefore(wrap,D); wrap.appendChild(D);
+    var T=document.createElement('input'); T.type='text'; T.className=(D.className?D.className+' ':'')+'vndate-t'; T.inputMode='numeric'; T.placeholder='dd/mm/yyyy'; T.maxLength=10; T.autocomplete='off'; T.setAttribute('aria-label','Ngày (ngày/tháng/năm)');
+    var btn=document.createElement('button'); btn.type='button'; btn.className='vndate-b'; btn.tabIndex=-1; btn.textContent='📅'; btn.setAttribute('aria-label','Mở lịch chọn ngày');
+    wrap.appendChild(T); wrap.appendChild(btn);
+    function toDisp(v){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m?m[3]+'/'+m[2]+'/'+m[1]:''; }
+    function toIso(s){ var m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec((s||'').trim()); if(!m) return null; var d=+m[1],mo=+m[2],y=+m[3]; if(mo<1||mo>12||d<1||d>31||y<1900||y>2100) return null; var dt=new Date(y,mo-1,d); if(dt.getMonth()!==mo-1||dt.getDate()!==d) return null; return y+'-'+('0'+mo).slice(-2)+'-'+('0'+d).slice(-2); }
+    T.value=toDisp(D.value);
+    function commit(){ var iso=toIso(T.value); if(T.value&&iso){ if(D.value!==iso){ D.value=iso; D.dispatchEvent(new Event('change',{bubbles:true})); } T.classList.remove('bad'); } else if(!T.value){ if(D.value){ D.value=''; D.dispatchEvent(new Event('change',{bubbles:true})); } T.classList.remove('bad'); } else { if(D.value){ D.value=''; D.dispatchEvent(new Event('change',{bubbles:true})); } T.classList.add('bad'); } }
+    T.addEventListener('input',function(){ var v=T.value.replace(/[^\d]/g,'').slice(0,8),o=v; if(v.length>4) o=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4); else if(v.length>2) o=v.slice(0,2)+'/'+v.slice(2); T.value=o; var iso=toIso(T.value); if(iso){ D.value=iso; T.classList.remove('bad'); } else { D.value=''; if(T.value.length>=10) T.classList.add('bad'); else T.classList.remove('bad'); } });
+    T.addEventListener('change',commit); T.addEventListener('blur',commit);
+    btn.addEventListener('click',function(){ try{ if(D.showPicker){ D.style.pointerEvents='auto'; D.showPicker(); D.style.pointerEvents=''; } else D.focus(); }catch(e){} });
+    D.addEventListener('change',function(){ T.value=toDisp(D.value); T.classList.remove('bad'); });
+    if(D.required){ T.required=true; D.required=false; }
+  });
+}
+document.addEventListener('submit',function(e){ var f=e.target; if(!f||!f.querySelectorAll) return; var ts=f.querySelectorAll('.vndate-t'); for(var i=0;i<ts.length;i++){ var T=ts[i], D=T.parentNode.querySelector('input[type="date"]'); if(!D) continue; if(!D.value && (T.required||(T.value&&T.value.trim()))){ e.preventDefault(); e.stopPropagation(); T.classList.add('bad'); T.focus(); if(typeof toast==='function') toast('Ngày chưa đúng, hãy nhập dạng ngày/tháng/năm (vd 25/12/2026)'); return; } } },true);
 function render(){
   hideTip&&$("#tipBox")&&($("#tipBox").hidden=true);
   $("#periodLbl").textContent=`Tháng ${S.m}/${S.y}`;
@@ -1777,6 +1810,7 @@ function render(){
   $(".period").style.visibility = (S.tab==="kehoach"||S.tab==="mophong"||S.tab==="quy")?"hidden":"visible";
   const keep=document.activeElement&&document.activeElement.id;
   VIEWS[S.tab]();
+  enhanceDates();
   if(keep&&document.getElementById(keep)&&document.activeElement===document.body) document.getElementById(keep).focus();
 }
 function go(tab){ if(!VIEWS[tab]) return; S.tab=tab; try{history.replaceState(null,"","#"+tab);}catch(e){} render(); window.scrollTo(0,0); }
@@ -1806,10 +1840,14 @@ document.addEventListener("click",async e=>{
     if(t.dataset.armed!=="1"){ t.dataset.armed="1"; t.textContent="Xóa thật?"; setTimeout(()=>{if(t.isConnected){t.dataset.armed="";t.textContent=t.closest("form")?"Xóa quỹ":"Xóa";}},3000); return; }
     S.openEdit.delete(t.dataset.delFund); S.funds=S.funds.filter(f=>f.id!==t.dataset.delFund); render(); await remove("funds/"+t.dataset.delFund); toast("Đã xóa quỹ"); return;
   }
-  if(t.dataset.prio){ const fund=S.funds.find(x=>x.id===t.dataset.prio); if(!fund) return; fund.priority=isFixed(fund)?"flex":"fixed"; render(); await write("funds/"+fund.id,fund); toast(isFixed(fund)?"Đã đặt quỹ cố định, được góp đủ trước":"Đã đặt quỹ linh hoạt, có thể giãn hạn"); return; }
+  if(t.dataset.prio){ const fund=S.funds.find(x=>x.id===t.dataset.prio); if(!fund) return;
+    if(!isFixed(fund)&&S.funds.filter(x=>x.id!==fund.id&&isFixed(x)).length>=FIXED_MAX){ warnToast(`Chỉ nên cố định tối đa ${FIXED_MAX} quỹ tiết kiệm. Hãy chuyển một quỹ cố định khác sang linh hoạt trước.`); return; }
+    fund.priority=isFixed(fund)?"flex":"fixed"; render(); await write("funds/"+fund.id,fund); toast(isFixed(fund)?"Đã đặt quỹ cố định, được góp đủ trước":"Đã đặt quỹ linh hoạt, có thể giãn hạn"); return; }
   if(t.dataset.goldVal){ const v=S.invs.find(x=>x.id===t.dataset.goldVal); if(!v) return; const val=Math.round(goldQty(v)*Number(v.goldBuy||0));
     v.valuations=[...(v.valuations||[]).filter(x=>x.date!==iso(today)),{id:newId(),date:iso(today),value:val}]; render(); await write("investments/"+v.id,v); toast(`Đã cập nhật giá trị ${vnd(val)}`); return; }
-  if(t.dataset.prioInv){ const v=S.invs.find(x=>x.id===t.dataset.prioInv); if(!v) return; v.priority=isFixed(v)?"flex":"fixed"; render(); await write("investments/"+v.id,v); toast(isFixed(v)?"Đã đặt khoản cố định, được góp đủ trước":"Đã đặt khoản linh hoạt"); return; }
+  if(t.dataset.prioInv){ const v=S.invs.find(x=>x.id===t.dataset.prioInv); if(!v) return;
+    if(!isFixed(v)&&S.invs.filter(x=>x.id!==v.id&&isFixed(x)).length>=FIXED_MAX){ warnToast(`Chỉ nên cố định tối đa ${FIXED_MAX} khoản đầu tư. Hãy chuyển một khoản cố định khác sang linh hoạt trước.`); return; }
+    v.priority=isFixed(v)?"flex":"fixed"; render(); await write("investments/"+v.id,v); toast(isFixed(v)?"Đã đặt khoản cố định, được góp đủ trước":"Đã đặt khoản linh hoạt"); return; }
   if(t.id==="applyInvBalance"){ const b=invBalancePlan(portfolio().rows,idleI()); const ch=b.sug.filter(s=>s.pay<s.need&&s.pay>0); if(!ch.length) return;
     for(const s of ch){ s.v.monthly=s.pay; if(s.newEnd) s.v.end=iso(s.newEnd); }
     render(); for(const s of ch) await write("investments/"+s.v.id,s.v); toast(`Đã cân đối ${ch.length} khoản linh hoạt`); return; }
@@ -1983,9 +2021,11 @@ document.addEventListener("submit",async e=>{
   }
   if(f.dataset.invForm){
     const v=S.invs.find(x=>x.id===f.dataset.invForm); if(!v) return; const fd=new FormData(f);
+    let priBlk=false;
+    if(fd.get("priority")==="fixed"&&!isFixed(v)&&S.invs.filter(x=>x.id!==v.id&&isFixed(x)).length>=FIXED_MAX){ fd.set("priority","flex"); priBlk=true; }
     for(const [k,val] of fd.entries()){ if(["initial","target","monthly"].includes(k)) v[k]=parseMoney(val); else if(k==="rate") v[k]=(parseFloat(String(val).replace(",","."))||0)/100; else v[k]=val; }
     S.openEdit.delete(v.id); render(); await write("investments/"+v.id,v);
-    { const c=invCalc(v), w=[]; if(v.end&&parseISO(v.end)<today) w.push(`Hạn mục tiêu ${dmy(v.end)} đã qua`);
+    { const c=invCalc(v), w=[]; if(priBlk) w.push(`Chỉ cố định tối đa ${FIXED_MAX} khoản đầu tư, đã giữ khoản này là linh hoạt`); if(v.end&&parseISO(v.end)<today) w.push(`Hạn mục tiêu ${dmy(v.end)} đã qua`);
       if(v.target&&v.target<=c.value) w.push(`Mục tiêu ${vnd(v.target)} đã đạt (giá trị hiện tại ${vnd(c.value)})`);
       if(Number(v.rate)>0.2) w.push(`Lợi nhuận ${pct(Number(v.rate),1)}/năm khá lạc quan`);
       if(v.target&&!v.end&&!v.monthly) w.push("Có mục tiêu nhưng chưa có hạn hoặc góp mỗi tháng, app chưa cân đối được khoản này");
@@ -1996,6 +2036,8 @@ document.addEventListener("submit",async e=>{
     { const st=fd.get("start"), en=fd.get("end"), tg=fd.get("target");
       if(fund.kind!=="emergency"&&st&&en&&en<=st){ warnToast("Ngày hoàn thành phải sau ngày bắt đầu, chưa lưu"); return; }
       if(fund.kind!=="emergency"&&tg!==null&&!parseMoney(tg)){ warnToast("Số tiền mục tiêu phải lớn hơn 0, chưa lưu"); return; } }
+    let priBlk=false;
+    if(fd.get("priority")==="fixed"&&!isFixed(fund)&&S.funds.filter(x=>x.id!==fund.id&&isFixed(x)).length>=FIXED_MAX){ fd.set("priority","flex"); priBlk=true; }
     for(const [k,v] of fd.entries()){
       if(["fixedCost","target","initial"].includes(k)) fund[k]=parseMoney(v);
       else if(["reserveMonths","months"].includes(k)) fund[k]=parseInt(v,10)||1;
@@ -2003,7 +2045,7 @@ document.addEventListener("submit",async e=>{
       else fund[k]=v;
     }
     S.openEdit.delete(fund.id); render(); await write("funds/"+fund.id,fund);
-    { const c=fundCalc(fund), w=[]; if(!c.done&&c.deadline<today) w.push(`Hạn ${dmy(iso(c.deadline))} đã qua`);
+    { const c=fundCalc(fund), w=[]; if(priBlk) w.push(`Chỉ cố định tối đa ${FIXED_MAX} quỹ, đã giữ quỹ này là linh hoạt`); if(!c.done&&c.deadline<today) w.push(`Hạn ${dmy(iso(c.deadline))} đã qua`);
       if(fund.rate>0.15) w.push(`Lợi nhuận ${(fund.rate*100).toLocaleString("vi-VN")}%/năm khá cao cho quỹ tiết kiệm`);
       if(fund.kind==="emergency"&&!fund.fixedCost) w.push("Chưa nhập chi phí cố định/tháng");
       if(!c.done&&idleS()>0&&c.need>idleS()) w.push(`Riêng quỹ này cần góp ${vnd(c.need)}/tháng, nhiều hơn nhàn rỗi ${vnd(idleS())}`);
