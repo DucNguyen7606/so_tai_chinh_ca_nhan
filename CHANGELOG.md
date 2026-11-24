@@ -1,5 +1,15 @@
 # Lịch sử thay đổi
 
+## 1.2.0 (24/11/2026)
+
+### Giao diện thẻ quỹ tiết kiệm
+- Gộp nút Sửa/Xóa vào menu ⋯ ở góc thẻ, bỏ mục "Sửa thông tin quỹ" bị trùng.
+- Số đã góp / mục tiêu to hơn, kèm % hoàn thành; thanh tiến độ dày hơn. Bớt các biểu tượng (i) lặp lại.
+- "Cần góp/tháng" và "Hạn" nổi bật thành 2 ô; "Lãi" và "Rút ra ước tính" chỉ hiện khi quỹ đã có tiền.
+- Form góp thu gọn thành nút "＋ Góp <số gợi ý>", bấm mới mở ô số tiền (điền sẵn) và ngày.
+- "Lịch sử góp" thành link nhỏ ở cuối thẻ.
+- Hiệu ứng nền (xu, lì xì, lấp lánh) ít hơn và nằm phía sau thẻ, không bay đè lên nội dung.
+
 ## 1.1.1 (18/11/2026)
 
 ### Giao diện

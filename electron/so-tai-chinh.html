@@ -418,6 +418,46 @@ details.edit{border-top:1px solid var(--line);padding-top:10px}
 .fund .blk{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px;background:color-mix(in srgb,var(--line) 9%,transparent)}
 .fund .blk>.blk-h{font-weight:700;font-size:.9rem;color:var(--fg);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .fund details.edit,.fund details[data-hist-box]{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:12px;background:color-mix(in srgb,var(--line) 9%,transparent)}
+
+/* ===== Thẻ quỹ gọn (v1.2) ===== */
+.fund-v2{gap:14px}
+.fund-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.fund-title{display:grid;gap:6px;min-width:0}
+.fund-title h3{margin:0;font-size:1.08rem}
+.fund-tags{display:flex;flex-wrap:wrap;gap:6px}
+.fund-tags .pill{font-size:.72rem;padding:2px 9px}
+details.more{position:relative;flex:none}
+details.more>summary{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;color:var(--muted);font-size:1.25rem;line-height:1;font-weight:700;margin:0}
+details.more>summary:hover,details.more[open]>summary{background:var(--surface-2);color:var(--fg)}
+details.more[open]>summary{margin:0}
+.more-menu{position:absolute;right:0;top:36px;z-index:5;display:grid;min-width:170px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:0 12px 30px -10px rgb(0 0 0/.3)}
+.more-menu button{justify-content:flex-start;text-align:left;width:100%;padding:8px 10px;border-radius:8px;color:var(--fg)}
+.more-menu button:hover{background:var(--surface-2)}
+.more-menu button.danger{color:var(--bad)}
+.fund-prog{display:grid;gap:8px}
+.fund-amt{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.fund-amt .big{font-size:1.9rem;font-weight:800;line-height:1;color:var(--sav-ink)}
+.is-done .fund-amt .big{color:var(--inc-ink)}
+.fund-amt .of{color:var(--muted);font-size:.95rem;font-weight:600}
+.fund-amt .pct{margin-left:auto;font-weight:700;font-size:.9rem;color:var(--sav-ink)}
+.fund-v2 .bar{height:14px}
+.fund-v2 .cheer{font-size:.8rem}
+.fund-key{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fund-key>div{display:grid;gap:2px;padding:9px 12px;border-radius:12px;background:color-mix(in srgb,var(--sav) 10%,var(--surface))}
+.fund-key span{font-size:.74rem;color:var(--muted);font-weight:600}
+.fund-key b{font-size:1.02rem;font-weight:700}
+.fund-sub{font-size:.8rem;color:var(--muted)}
+.fund-sub b{color:var(--fg);font-weight:600}
+.fund-v2 .blk{margin-top:0}
+.fund-v2 .chk{display:flex;gap:8px;align-items:center;color:var(--fg)}
+.fund-v2 .chk input{width:auto}
+.fund-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.fund-foot>button{padding:8px 16px}
+.fund .fund-foot details.hist-link{border:0;padding:0;margin:0;background:none;flex:1 1 auto;text-align:right}
+.hist-link>summary{font-size:.82rem;color:var(--muted)!important;font-weight:600}
+.hist-link>summary:hover{color:var(--acc-ink)!important}
+.hist-link[open]{flex-basis:100%!important;text-align:left!important}
+.hist-link[open]>summary{text-align:right}
 /* ===== Giao diện "Mèo động lực" ===== */
 body{margin:0;background:
   radial-gradient(900px 500px at 100% -10%,color-mix(in srgb,var(--acc-2) 14%,transparent),transparent 60%),
@@ -523,7 +563,7 @@ details>summary{color:var(--acc-ink)}
 .center-card{grid-column:1/-1;justify-self:center;width:100%;max-width:780px}
 /* nền động: đồng xu bay vào ví, cánh hoa rơi */
 main{position:relative;z-index:1}
-#bgfx{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #bgfx .fx{position:absolute;left:0;top:0}
 #bgfx .fx>i{display:block}
 #bgfx svg{display:block}
@@ -767,7 +807,7 @@ const S = {
   tab:"tongquan", y:today.getFullYear(), m:today.getMonth()+1,
   tx:[], funds:[], invs:[], budgets:{}, plan:null, settings:{idle:4500000},
   db:null, loaded:{tx:false,funds:false,plan:false},
-  txType:"out", planZoom:"stage", openEdit:new Set(), openHist:new Set(), sim:{inc:7000000, exp:3500000, share:.8, rate:.10, years:30, infl:.04, start:20, monthly:1000000, retire:65, simRate:.10, real:false, base:100000000, erosion:.03}
+  txType:"out", planZoom:"stage", openEdit:new Set(), openHist:new Set(), openDep:new Set(), sim:{inc:7000000, exp:3500000, share:.8, rate:.10, years:30, infl:.04, start:20, monthly:1000000, retire:65, simRate:.10, real:false, base:100000000, erosion:.03}
 };
 try{ const saved = JSON.parse(localStorage.getItem("stcdt.sim")||"null"); if(saved) Object.assign(S.sim, saved);}catch(e){}
 
@@ -1450,22 +1490,28 @@ function vQuy(){
 }
 function fundCard(f,c){
   const late=!c.done && today>c.deadline;
-  const pill=c.done?`<span class="pill good">Đã hoàn thành</span>`:late?`<span class="pill bad">Quá hạn</span>`:`<span class="pill neu">Còn ${c.remaining} tháng${T("fRemain")}</span>`;
-  const isE=f.kind==="emergency", id=esc(f.id), editOpen=S.openEdit.has(f.id);
-  return `<div class="card fund${c.done?" is-done":""}" data-fund="${id}">
-    <div class="card-h"><h3>${esc(fundName(f))}</h3><div class="fund-actions"><button class="pill prio ${isFixed(f)?"fixed":"flex"}" data-prio="${id}" title="Bấm để đổi loại quỹ">${isFixed(f)?"📌 Cố định":"🌿 Linh hoạt"}</button>${pill}
-      <button class="ghost" data-edit-fund="${id}" aria-expanded="${editOpen}">${editOpen?"Đóng":"Sửa"}</button>
-      <button class="ghost danger" data-del-fund="${id}">Xóa</button></div></div>
-    <div class="row"><span class="lt"><span class="big num">${compact(c.bal)}</span>${T("fBal")}</span><span class="hint num lt">/ ${vnd(c.target)}${T(isE?"fTargetE":"fTargetG")}</span></div>
-    <div class="bar ${c.done?"inc":"sav"}"><i style="width:${(c.progress*100).toFixed(1)}%"></i></div>
-    <div class="cheer">${c.done?"🏆 Hoàn thành rồi! Mèo tự hào về bạn":c.progress>=.75?`🔥 ${pct(c.progress)}, sắp về đích rồi!`:c.progress>=.25?`💪 Đã được ${pct(c.progress)}, còn ${compact(Math.max(0,c.target-c.bal))}`:`🌱 ${pct(c.progress)}, khởi đầu nào cũng nhỏ`}</div>
-    <div class="meta">
-      <div><span class="lt">Cần góp mỗi tháng${T("fNeed")}</span><b class="num">${vnd(c.need)}</b></div>
-      <div><span class="lt">Hạn${T(isE?"fDeadE":"fDeadG")}</span><b class="num">${dmy(iso(c.deadline))}</b></div>
-      <div><span class="lt">Lãi đến hôm nay${T("fInt")}</span><b class="num">+${vn(c.interest)}</b></div>
-      <div><span class="lt">Rút ra ước tính${T("fWd")}</span><b class="num">${vn(c.withdraw)}</b></div>
+  const pill=c.done?`<span class="pill good">Đã hoàn thành</span>`:late?`<span class="pill bad">Quá hạn</span>`:`<span class="pill neu">Còn ${c.remaining} tháng</span>`;
+  const isE=f.kind==="emergency", id=esc(f.id), editOpen=S.openEdit.has(f.id), depOpen=S.openDep.has(f.id);
+  const cheer=c.done?"🏆 Hoàn thành rồi! Mèo tự hào về bạn":c.progress>=.75?"🔥 Sắp về đích rồi!":c.progress>=.25?`💪 Còn ${compact(Math.max(0,c.target-c.bal))} nữa`:"🌱 Khởi đầu nào cũng nhỏ";
+  const sugg=c.done?0:c.need;
+  return `<div class="card fund fund-v2${c.done?" is-done":""}" data-fund="${id}">
+    <div class="fund-top">
+      <div class="fund-title"><h3>${esc(fundName(f))}</h3>
+        <div class="fund-tags"><button class="pill prio ${isFixed(f)?"fixed":"flex"}" data-prio="${id}" title="Bấm để đổi loại quỹ">${isFixed(f)?"📌 Cố định":"🌿 Linh hoạt"}</button>${pill}</div></div>
+      <details class="more"><summary aria-label="Tùy chọn quỹ" title="Tùy chọn">⋯</summary>
+        <div class="more-menu"><button class="ghost" data-edit-fund="${id}">${editOpen?"✕ Đóng phần sửa":"✏️ Sửa thông tin"}</button><button class="ghost danger" data-del-fund="${id}">🗑️ Xóa quỹ</button></div></details>
     </div>
-    <details class="edit" data-edit-box="${id}" ${editOpen?"open":""}><summary>Sửa thông tin quỹ</summary>
+    <div class="fund-prog">
+      <div class="fund-amt"><span class="big num" title="${vnd(c.bal)}">${compact(c.bal)}</span><span class="of num lt" title="${vnd(c.target)}">/ ${compact(c.target)}${T(isE?"fTargetE":"fTargetG")}</span><span class="pct num">${pct(c.progress)}</span></div>
+      <div class="bar ${c.done?"inc":"sav"}"><i style="width:${(c.progress*100).toFixed(1)}%"></i></div>
+      <div class="cheer">${cheer}</div>
+    </div>
+    <div class="fund-key">
+      <div><span class="lt">Cần góp/tháng${T("fNeed")}</span><b class="num">${c.done?"Đã đủ":vnd(c.need)}</b></div>
+      <div><span>Hạn</span><b class="num">${dmy(iso(c.deadline))}</b></div>
+    </div>
+    ${(c.bal>0||c.interest>0)?`<div class="fund-sub">Lãi đến nay <b class="num">+${vn(c.interest)}</b> · <span class="lt">Rút ra ước tính${T("fWd")}</span> <b class="num">${vn(c.withdraw)}</b></div>`:""}
+    ${editOpen?`<div class="blk"><div class="blk-h">✏️ Sửa thông tin quỹ</div>
       <form class="form" data-fund-form="${id}" autocomplete="off">
         ${isE? `<label class="f">${L("Chi phí cố định/tháng","fFixed")}<input name="fixedCost" data-money inputmode="decimal" value="${vn(f.fixedCost)}"></label>
                 <label class="f">${L("Số tháng dự phòng","fReserve")}<input name="reserveMonths" type="number" min="1" max="24" value="${esc(f.reserveMonths)}"></label>
@@ -1479,18 +1525,20 @@ function fundCard(f,c){
         <label class="f">${L("Nơi gửi","fMethod")}<select name="method">${METHODS.map(m=>`<option ${m===f.method?"selected":""}>${m}</option>`).join("")}</select></label>
         <label class="f">${L("Số tiền đã có","fInit")}<input name="initial" data-money inputmode="decimal" value="${vn(f.initial)}"></label>
         <div class="full row"><button type="button" class="danger" data-del-fund="${id}">Xóa quỹ</button><div class="row" style="gap:6px"><button type="button" data-edit-fund="${id}">Hủy</button><button class="primary" type="submit">Lưu thay đổi</button></div></div>
-      </form>
-    </details>
-    <div class="blk"><div class="blk-h">➕ Góp thêm vào quỹ</div>
+      </form></div>`:""}
+    ${depOpen?`<div class="blk"><div class="blk-h">➕ Góp vào quỹ</div>
     <form class="form" data-dep-form="${id}" autocomplete="off">
-      <label class="f">${L("Góp thêm","money")}<input name="amt" data-money inputmode="decimal" placeholder="${compact(c.need)||"500k"}" required></label>
+      <label class="f">${L("Số tiền","money")}<input name="amt" data-money inputmode="decimal" value="${sugg?vn(sugg):""}" placeholder="500k" required></label>
       <label class="f">Ngày<input name="date" type="date" value="${iso(today)}" required></label>
-      <label class="f full" style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" name="log" checked style="width:auto"> Ghi vào Thu chi (Tiết kiệm/Đầu tư)${T("fLog")}</label>
-      <div class="full"><button class="primary" type="submit">Ghi khoản góp</button></div>
-    </form></div>
-    <details data-hist-box="${id}" ${S.openHist.has(f.id)?"open":""}><summary>Lịch sử góp (${c.deps.length})</summary>
-      ${c.deps.length? `<table><tbody>${[...c.deps].reverse().map(d=>`<tr><td class="num">${dmy(d.date)}</td><td class="r num">${vn(d.amount)}</td><td class="r"><button class="ghost" data-del-dep="${id}|${esc(d.id||d.date+"|"+d.amount)}">Xóa</button></td></tr>`).join("")}</tbody></table>` : `<div class="empty">Chưa góp lần nào.</div>`}
-    </details>
+      <label class="f full chk"><input type="checkbox" name="log" checked> Ghi vào Thu chi${T("fLog")}</label>
+      <div class="full row" style="justify-content:flex-end;gap:6px"><button type="button" data-dep-toggle="${id}">Hủy</button><button class="primary" type="submit">Ghi khoản góp</button></div>
+    </form></div>`:""}
+    <div class="fund-foot">
+      ${depOpen?"<span></span>":`<button class="primary" data-dep-toggle="${id}">＋ Góp ${sugg?compact(sugg):"thêm"}</button>`}
+      <details class="hist-link" data-hist-box="${id}" ${S.openHist.has(f.id)?"open":""}><summary>Lịch sử góp (${c.deps.length}) ›</summary>
+        ${c.deps.length? `<table><tbody>${[...c.deps].reverse().map(d=>`<tr><td class="num">${dmy(d.date)}</td><td class="r num">${vn(d.amount)}</td><td class="r"><button class="ghost" data-del-dep="${id}|${esc(d.id||d.date+"|"+d.amount)}">Xóa</button></td></tr>`).join("")}</tbody></table>` : `<div class="empty">Chưa góp lần nào.</div>`}
+      </details>
+    </div>
   </div>`;
 }
 
@@ -1855,6 +1903,7 @@ document.addEventListener("click",async e=>{
     if(!ch.length) return;
     for(const s of ch){ const f=s.f; if(f.kind==="emergency") f.months=Number(f.months||6)+s.extra; else f.end=iso(addMonths(parseISO(f.end),s.extra)); }
     render(); for(const s of ch) await write("funds/"+s.f.id,s.f); toast(`Đã giãn hạn ${ch.length} quỹ linh hoạt`); return; }
+  if(t.dataset.depToggle){ const id=t.dataset.depToggle; if(S.openDep.has(id)) S.openDep.delete(id); else S.openDep.add(id); render(); if(S.openDep.has(id)){ const i=document.querySelector(`[data-dep-form="${id}"] input[name=amt]`); if(i){ i.focus(); i.select(); } } return; }
   if(t.dataset.editFund){ const id=t.dataset.editFund; if(S.openEdit.has(id)) S.openEdit.delete(id); else S.openEdit.add(id); render(); if(S.openEdit.has(id)) document.querySelector(`[data-fund-form="${id}"] input`)?.focus(); return; }
   if(t.dataset.addInv){
     const id=newId(), v={id,name:"Khoản đầu tư mới",kind:"Chứng chỉ quỹ",initial:0,deposits:[],valuations:[],order:Date.now()};
@@ -1970,7 +2019,7 @@ document.addEventListener("submit",async e=>{
     const amt=parseMoney(f.amt.value), date=f.date.value; if(!amt){ toast("Nhập số tiền góp"); return; }
     let tx=null; if(f.log.checked){ tx={id:newId(),t:"out",name:"Tiết kiệm",date,group:SAVE_GROUP,amount:amt,note:fundName(fund),fundId:fund.id,created:Date.now()}; S.tx.push(tx); }
     fund.deposits=[...(fund.deposits||[]),{id:newId(),date,amount:amt,...(tx?{txId:tx.id}:{})}];
-    render(); await write("funds/"+fund.id,fund); if(tx) await write("tx/"+tx.id,tx);
+    S.openDep.delete(fund.id); render(); await write("funds/"+fund.id,fund); if(tx) await write("tx/"+tx.id,tx);
     { const c=fundCalc(fund), w=[]; if(isFuture(date)) w.push(`Ngày góp ${dmy(date)} ở tương lai`);
       if(c.target>0&&c.bal>c.target*1.05) w.push(`Quỹ đã có ${vnd(c.bal)}, vượt mục tiêu ${vnd(c.target)}`);
       const mk=date.slice(0,7), monthDep=S.funds.reduce((a,f2)=>a+(f2.deposits||[]).filter(x=>x.date.slice(0,7)===mk).reduce((b,x)=>b+Number(x.amount),0),0);
@@ -2052,6 +2101,8 @@ document.addEventListener("submit",async e=>{
       if(!(w.length&&warnToast(["Đã lưu thay đổi quỹ",...w]))) toast("Đã lưu thay đổi quỹ"); } return;
   }
 });
+document.addEventListener("click",e=>{ document.querySelectorAll("details.more[open]").forEach(d=>{ if(!d.contains(e.target)) d.open=false; }); },true);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll("details.more[open]").forEach(d=>d.open=false); });
 document.addEventListener("toggle",e=>{ const d=e.target; if(!(d instanceof HTMLDetailsElement)) return;
   if(d.dataset.cmpBox){ S.openCmp=S.openCmp||new Set(); d.open?S.openCmp.add(d.dataset.cmpBox):S.openCmp.delete(d.dataset.cmpBox); }
   if(d.dataset.editBox){ d.open?S.openEdit.add(d.dataset.editBox):S.openEdit.delete(d.dataset.editBox); const b=document.querySelector(`button[data-edit-fund="${d.dataset.editBox}"][aria-expanded],button[data-edit-inv="${d.dataset.editBox}"][aria-expanded]`); if(b){b.textContent=d.open?"Đóng":"Sửa";b.setAttribute("aria-expanded",d.open);} }
@@ -2086,19 +2137,19 @@ function buildFx(){
   const wx=W-48, wy=H-50, out=[];
   const coin=`<svg viewBox="0 0 24 24"><defs><radialGradient id="cg" cx=".35" cy=".3"><stop offset="0" stop-color="#fffbe0"/><stop offset=".45" stop-color="#fcd34d"/><stop offset="1" stop-color="#d99a06"/></radialGradient></defs><circle cx="12" cy="12" r="10.5" fill="url(#cg)" stroke="#c98a00" stroke-width="1.6"/><circle cx="12" cy="12" r="7" fill="none" stroke="#f5b50a" stroke-width="1.1"/><text x="12" y="16" text-anchor="middle" font-size="10" font-weight="800" fill="#8a5600" font-family="system-ui">₫</text></svg>`;
   // 1) đồng xu vàng bay vào túi tiền
-  const nc=small?8:14;
+  const nc=small?4:7;
   for(let k=0;k<nc;k++){ const d=5+R()*5;
     out.push(`<span class="fx coin" style="--x0:${(R()*W*.85).toFixed(0)}px;--y0:${(-40-R()*H*.2).toFixed(0)}px;--x1:${wx}px;--y1:${wy}px;--d:${d.toFixed(1)}s;--dl:${(-R()*d).toFixed(1)}s;--s:${(18+R()*12).toFixed(0)}px"><i>${coin}</i></span>`); }
   // 2) lì xì, cỏ bốn lá, thỏi vàng, tiền giấy rơi chậm
-  const LUCKY=["🧧","🍀","💵","🪙","🧧","✨","💎","🍀"], nl=small?5:9;
+  const LUCKY=["🧧","🍀","💵","🪙","🧧","✨","💎","🍀"], nl=small?2:4;
   for(let k=0;k<nl;k++){ const d=13+R()*10, x=R()*W;
     out.push(`<span class="fx petal" style="--x0:${x.toFixed(0)}px;--x1:${(x+(R()*160-80)).toFixed(0)}px;--d:${d.toFixed(1)}s;--dl:${(-R()*d).toFixed(1)}s"><i><i class="lucky" style="--s:${(14+R()*10).toFixed(0)}px">${LUCKY[k%LUCKY.length]}</i></i></span>`); }
   // 3) bụi vàng bay lên
-  const nd=small?8:16;
+  const nd=small?4:8;
   for(let k=0;k<nd;k++){ const d=9+R()*8, x=R()*W;
     out.push(`<span class="fx rise" style="--x0:${x.toFixed(0)}px;--x1:${(x+(R()*80-40)).toFixed(0)}px;--d:${d.toFixed(1)}s;--dl:${(-R()*d).toFixed(1)}s;--s:${(3+R()*4).toFixed(1)}px"><i></i></span>`); }
   // 4) lấp lánh
-  const ns=small?8:16;
+  const ns=small?3:6;
   for(let k=0;k<ns;k++){ const d=2.4+R()*3;
     out.push(`<span class="fx"><i class="spark" style="--p:translate(${(R()*W).toFixed(0)}px,${(R()*H).toFixed(0)}px);--d:${d.toFixed(1)}s;--dl:${(-R()*d).toFixed(1)}s;font-size:${(10+R()*10).toFixed(0)}px">✦</i></span>`); }
   box.innerHTML=out.join("");
