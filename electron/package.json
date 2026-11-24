@@ -1,7 +1,7 @@
 {
   "name": "so-thu-chi-dau-tu",
   "productName": "So Thu Chi Dau Tu",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Sổ Thu Chi & Đầu Tư",
   "author": "Nguyen Duy Duc",
   "main": "main.js",
