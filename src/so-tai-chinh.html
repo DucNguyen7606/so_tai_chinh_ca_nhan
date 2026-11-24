@@ -233,6 +233,13 @@ details.more[open]>summary{margin:0}
 .fund-key>div{display:grid;gap:2px;padding:9px 12px;border-radius:12px;background:color-mix(in srgb,var(--sav) 10%,var(--surface))}
 .fund-key span{font-size:.74rem;color:var(--muted);font-weight:600}
 .fund-key b{font-size:1.02rem;font-weight:700}
+.fund-key small{font-size:.72rem}
+.gold-det>summary{color:#92400e!important;font-weight:700}
+.gold-det:not([open]){padding:10px 12px}
+.gold-det[open]>summary{display:none}
+.inv-card .fund-amt .big{color:var(--inv-ink)}
+.inv-card .fund-key>div{background:color-mix(in srgb,var(--inv) 9%,var(--surface))}
+.inv-card .fund-amt .pct{font-size:.85rem}
 .fund-sub{font-size:.8rem;color:var(--muted)}
 .fund-sub b{color:var(--fg);font-weight:600}
 .fund-v2 .blk{margin-top:0}
@@ -1325,7 +1332,7 @@ function goldBlock(v,c){
   if(q){ facts.push(`🥇 Đang giữ <b class="num">${chi(q)} chỉ</b> = ${chi(q*3.75)} g = ${chi(q/10)} lượng${buy?`, bán ngay được ≈ <b class="num">${vnd(q*buy)}</b>`:""}`);
     const depQ=(v.deposits||[]).reduce((a,d)=>a+Number(d.qty||0),0);
     if(c.principal&&!Number(v.initial)&&Math.abs(depQ-q)<0.01) facts.push(`🧮 Giá vốn bình quân <b class="num">${vnd(c.principal/q)}</b>/chỉ${buy?` (${buy>=c.principal/q?"đang lãi":"đang lỗ"} ${vnd(Math.abs(buy-c.principal/q))}/chỉ so với giá mua vào)`:""}`); }
-  return `<div class="gold-box">
+  return `<details class="gold-box gold-det" data-cmp-box="gold:${id}" ${S.openCmp?.has("gold:"+v.id)?"open":""}><summary>🥇 Quy đổi ra chỉ vàng${q?` · đang giữ ${chi(q)} chỉ`:""} ›</summary>
     <div class="row"><b>🥇 Quy đổi ra chỉ vàng${T("gold")}</b><span class="hint">${v.goldDate?`giá ngày ${dmy(v.goldDate)}`:"nhập giá để quy đổi"} · tra: ${REF_LINKS[0].l.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener noreferrer">${n}</a>`).join(", ")}</span></div>
     <div class="form gold-in">
       <label class="f">${L("Giá bán ra / chỉ","goldSell")}<input data-gold="goldSell|${id}" data-money inputmode="decimal" value="${sell?vn(sell):""}" placeholder="vd 15tr"></label>
@@ -1334,25 +1341,31 @@ function goldBlock(v,c){
     </div>
     ${facts.length?`<ul class="gold-facts">${facts.map(x=>`<li>${x}</li>`).join("")}</ul>`:`<div class="hint">Nhập giá bán ra 1 chỉ để xem cần bao nhiêu tiền cho 1 chỉ, mục tiêu tương đương bao nhiêu chỉ.</div>`}
     ${q&&buy?`<button data-gold-val="${id}">Cập nhật giá trị = ${chi(q)} chỉ × giá mua vào (${compact(q*buy)})</button>`:""}
-  </div>`;
+  </details>`;
 }
 function invCard(v,c){
-  const id=esc(v.id), editOpen=S.openEdit.has(v.id), up=c.gain>=0;
-  return `<div class="card fund inv-card" data-inv="${id}">
-    <div class="card-h"><h3>${esc(v.name||"Khoản đầu tư")}</h3><div class="fund-actions"><button class="pill prio ${isFixed(v)?"fixed":"flex"}" data-prio-inv="${id}" title="Bấm để đổi loại">${isFixed(v)?"📌 Cố định":"🌿 Linh hoạt"}</button><span class="pill neu">${esc(v.kind||"Khác")}</span>
-      <button class="ghost" data-edit-inv="${id}" aria-expanded="${editOpen}">${editOpen?"Đóng":"Sửa"}</button>
-      <button class="ghost danger" data-del-inv="${id}">Xóa</button></div></div>
-    <div class="row"><span class="lt"><span class="big num">${compact(c.value)}</span>${T("pVal")}</span><span class="num" style="color:${up?"var(--good)":"var(--bad)"}">${up?"+":"−"}${vn(Math.abs(c.gain))} (${isFinite(c.gainPct)?pct(c.gainPct,1):"—"})</span></div>
-    ${c.progress!==null?`<div class="bar inv"><i style="width:${(c.progress*100).toFixed(1)}%"></i></div><div class="hint lt">Mục tiêu ${vnd(v.target)}${v.end?` trước ${dmy(v.end)}`:""}${T("vTarget")}</div>`:""}
-    <div class="meta">
-      ${(()=>{const nd=invNeedOf(v,c), src=Number(v.monthly)>0?"theo số bạn đặt":v.target&&v.end?(v.target<=c.value?"đã đạt mục tiêu":`để đủ ${compact(v.target)} trước ${dmy(v.end)}`):"";
-        return `<div class="inv-need full"><span class="lt">Cần góp mỗi tháng${T("vNeed")}</span><b class="num">${nd?vnd(nd):"—"}</b><span class="hint">${nd?src+(isGold(v)&&Number(v.goldSell)>0?` · ≈ ${chi(nd/Number(v.goldSell))} chỉ`:""):"Nhập mục tiêu + hạn, hoặc “Góp mỗi tháng” trong Sửa"}</span></div>`;})()}
-      <div><span class="lt">Tiền gốc${T("pPrin")}</span><b class="num">${vnd(c.principal)}</b></div>
-      <div><span>Cập nhật giá trị</span><b class="num">${c.lv?dmy(c.lv.date):"chưa có"}</b></div>
+  const id=esc(v.id), editOpen=S.openEdit.has(v.id), up=c.gain>=0, depOpen=S.openDep.has(v.id), valOpen=S.openDep.has("val:"+v.id);
+  const nd=invNeedOf(v,c), src=Number(v.monthly)>0?"theo số bạn đặt":v.target&&v.end?(v.target<=c.value?"đã đạt mục tiêu":""):"";
+  return `<div class="card fund inv-card fund-v2" data-inv="${id}">
+    <div class="fund-top">
+      <div class="fund-title"><h3>${esc(v.name||"Khoản đầu tư")}</h3>
+        <div class="fund-tags"><button class="pill prio ${isFixed(v)?"fixed":"flex"}" data-prio-inv="${id}" title="Bấm để đổi loại">${isFixed(v)?"📌 Cố định":"🌿 Linh hoạt"}</button><span class="pill neu">${esc(v.kind||"Khác")}</span></div></div>
+      <details class="more"><summary aria-label="Tùy chọn khoản đầu tư" title="Tùy chọn">⋯</summary>
+        <div class="more-menu"><button class="ghost" data-edit-inv="${id}">${editOpen?"✕ Đóng phần sửa":"✏️ Sửa thông tin"}</button><button class="ghost danger" data-del-inv="${id}">🗑️ Xóa khoản này</button></div></details>
     </div>
+    <div class="fund-prog">
+      <div class="fund-amt"><span class="big num" title="${vnd(c.value)}">${compact(c.value)}</span>${v.target?`<span class="of num lt" title="${vnd(v.target)}">/ ${compact(v.target)}${T("vTarget")}</span>`:""}<span class="pct num" style="color:${up?"var(--good)":"var(--bad)"}">${up?"+":"−"}${compact(Math.abs(c.gain))} (${isFinite(c.gainPct)?pct(c.gainPct,1):"—"})</span></div>
+      ${c.progress!==null?`<div class="bar inv"><i style="width:${(c.progress*100).toFixed(1)}%"></i></div><div class="cheer">${pct(c.progress)} mục tiêu</div>`:""}
+    </div>
+    <div class="fund-key">
+      <div><span class="lt">Cần góp/tháng${T("vNeed")}</span><b class="num">${nd?vnd(nd):"—"}</b>${src||(isGold(v)&&nd&&Number(v.goldSell)>0)?`<small class="hint">${src}${isGold(v)&&nd&&Number(v.goldSell)>0?`${src?" · ":""}≈ ${chi(nd/Number(v.goldSell))} chỉ`:""}</small>`:""}</div>
+      <div><span>Hạn</span><b class="num">${v.end?dmy(v.end):"—"}</b></div>
+    </div>
+    ${nd?"":`<div class="fund-sub">Nhập mục tiêu + hạn, hoặc “Góp mỗi tháng” trong ⋯ → Sửa thông tin để app tính số cần góp.</div>`}
+    <div class="fund-sub"><span class="lt">Tiền gốc${T("pPrin")}</span> <b class="num">${vnd(c.principal)}</b> · Cập nhật giá trị <b class="num">${c.lv?dmy(c.lv.date):"chưa có"}</b></div>
     ${invProjBlock(v,c)}
     ${isGold(v)?goldBlock(v,c):""}
-    <details class="edit" data-edit-box="${id}" ${editOpen?"open":""}><summary>Sửa thông tin</summary>
+    ${editOpen?`<div class="blk"><div class="blk-h">✏️ Sửa thông tin</div>
       <form class="form" data-inv-form="${id}" autocomplete="off">
         <label class="f full">Tên khoản đầu tư<input name="name" value="${esc(v.name)}" required></label>
         <label class="f">${L("Loại","vKind")}<select name="kind">${INV_KINDS.map(k=>`<option ${k===v.kind?"selected":""}>${k}</option>`).join("")}</select></label>
@@ -1363,25 +1376,27 @@ function invCard(v,c){
         <label class="f">${L("Góp mỗi tháng","vMonthly")}<input name="monthly" data-money inputmode="decimal" value="${v.monthly?vn(v.monthly):""}" placeholder="không bắt buộc"></label>
         <label class="f">${L("Loại ưu tiên","fPrio")}<select name="priority"><option value="fixed" ${isFixed(v)?"selected":""}>📌 Cố định (ưu tiên)</option><option value="flex" ${isFixed(v)?"":"selected"}>🌿 Linh hoạt</option></select></label>
         <div class="full row"><button type="button" class="danger" data-del-inv="${id}">Xóa khoản đầu tư</button><div class="row" style="gap:6px"><button type="button" data-edit-inv="${id}">Hủy</button><button class="primary" type="submit">Lưu thay đổi</button></div></div>
-      </form>
-    </details>
-    <div class="blk"><div class="blk-h">➕ Góp thêm vào khoản này</div>
+      </form></div>`:""}
+    ${depOpen?`<div class="blk"><div class="blk-h">➕ Góp vào khoản này</div>
     <form class="form" data-inv-dep-form="${id}" autocomplete="off">
-      <label class="f">${L("Góp thêm","money")}<input name="amt" data-money inputmode="decimal" required></label>
+      <label class="f">${L("Số tiền","money")}<input name="amt" data-money inputmode="decimal" value="${nd?vn(nd):""}" placeholder="500k" required></label>
       <label class="f">Ngày<input name="date" type="date" value="${iso(today)}" required></label>
       ${isGold(v)?`<label class="f">${L("Số chỉ mua được","goldDepQty")}<input name="qty" inputmode="decimal" placeholder="${v.goldSell?"tự tính theo giá bán ra":"vd 0,5"}"></label>`:""}
-      <label class="f full" style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" name="log" checked style="width:auto"> Ghi vào Thu chi (Đầu tư)${T("vLog")}</label>
-      <div class="full"><button class="primary" type="submit">Ghi khoản góp</button></div>
-    </form></div>
-    <div class="blk"><div class="blk-h">📈 Cập nhật giá trị hiện tại</div>
+      <label class="f full chk"><input type="checkbox" name="log" checked> Ghi vào Thu chi${T("vLog")}</label>
+      <div class="full row" style="justify-content:flex-end;gap:6px"><button type="button" data-dep-toggle="${id}">Hủy</button><button class="primary" type="submit">Ghi khoản góp</button></div>
+    </form></div>`:""}
+    ${valOpen?`<div class="blk"><div class="blk-h">📈 Cập nhật giá trị hiện tại</div>
     <form class="form" data-inv-val-form="${id}" autocomplete="off">
       <label class="f">${L("Giá trị hiện tại","vVal")}<input name="val" data-money inputmode="decimal" placeholder="${vn(c.value)}" required></label>
       <label class="f">Ngày<input name="date" type="date" value="${iso(today)}" required></label>
-      <div class="full"><button type="submit">Cập nhật giá trị</button></div>
-    </form></div>
-    <details data-hist-box="${id}" ${S.openHist.has(v.id)?"open":""}><summary>Lịch sử (${c.deps.length} lần góp, ${c.vals.length} lần cập nhật)</summary>
-      ${c.deps.length||c.vals.length? `<table><tbody>${[...c.deps.map(d=>({...d,k:"dep"})),...c.vals.map(d=>({...d,k:"val"}))].sort((a,b)=>a.date<b.date?1:-1).map(d=>`<tr><td class="num">${dmy(d.date)}</td><td>${d.k==="dep"?"Góp":"Giá trị"}</td><td class="r num">${vn(d.k==="dep"?d.amount:d.value)}</td><td class="r"><button class="ghost" data-del-invrec="${id}|${d.k}|${esc(d.id)}">Xóa</button></td></tr>`).join("")}</tbody></table>` : `<div class="empty">Chưa có lần góp nào.</div>`}
-    </details>
+      <div class="full row" style="justify-content:flex-end;gap:6px"><button type="button" data-dep-toggle="val:${id}">Hủy</button><button class="primary" type="submit">Cập nhật giá trị</button></div>
+    </form></div>`:""}
+    <div class="fund-foot">
+      <div class="row" style="gap:6px">${depOpen?"":`<button class="primary" data-dep-toggle="${id}">＋ Góp ${nd?compact(nd):"thêm"}</button>`}${valOpen?"":`<button data-dep-toggle="val:${id}" title="Cập nhật giá trị hiện tại">📈 Cập nhật giá trị</button>`}</div>
+      <details class="hist-link" data-hist-box="${id}" ${S.openHist.has(v.id)?"open":""}><summary>Lịch sử (${c.deps.length+c.vals.length}) ›</summary>
+        ${c.deps.length||c.vals.length? `<table><tbody>${[...c.deps.map(d=>({...d,k:"dep"})),...c.vals.map(d=>({...d,k:"val"}))].sort((a,b)=>a.date<b.date?1:-1).map(d=>`<tr><td class="num">${dmy(d.date)}</td><td>${d.k==="dep"?"Góp":"Giá trị"}</td><td class="r num">${vn(d.k==="dep"?d.amount:d.value)}</td><td class="r"><button class="ghost" data-del-invrec="${id}|${d.k}|${esc(d.id)}">Xóa</button></td></tr>`).join("")}</tbody></table>` : `<div class="empty">Chưa có lần góp nào.</div>`}
+      </details>
+    </div>
   </div>`;
 }
 
@@ -1813,7 +1828,7 @@ document.addEventListener("submit",async e=>{
     let tx=null; if(f.log.checked){ tx={id:newId(),t:"out",name:"Đầu tư",date,group:INV_GROUP,amount:amt,note:v.name,invId:v.id,created:Date.now()}; S.tx.push(tx); }
     let gq=0; if(isGold(v)){ gq=parseFloat(String(f.qty?.value||"").replace(",","."))||0; if(!gq&&Number(v.goldSell)>0) gq=Math.round(amt/Number(v.goldSell)*100)/100; if(gq) v.goldQty=Math.round((goldQty(v)+gq)*100)/100; }
     v.deposits=[...(v.deposits||[]),{id:newId(),date,amount:amt,...(gq?{qty:gq}:{}),...(tx?{txId:tx.id}:{})}];
-    render(); await write("investments/"+v.id,v); if(tx) await write("tx/"+tx.id,tx);
+    S.openDep.delete(v.id); render(); await write("investments/"+v.id,v); if(tx) await write("tx/"+tx.id,tx);
     { const w=[]; if(isFuture(date)) w.push(`Ngày góp ${dmy(date)} ở tương lai`);
       const mk=date.slice(0,7), monthDep=S.invs.reduce((a,x2)=>a+(x2.deposits||[]).filter(x=>x.date.slice(0,7)===mk).reduce((b,x)=>b+Number(x.amount),0),0);
       if(idleI()>0&&monthDep>idleI()) w.push(`Tháng này đã đầu tư ${vnd(monthDep)}, vượt nhàn rỗi cho đầu tư ${vnd(idleI())}`);
@@ -1825,7 +1840,7 @@ document.addEventListener("submit",async e=>{
     const v=S.invs.find(x=>x.id===f.dataset.invValForm); if(!v) return;
     const val=parseMoney(f.val.value), date=f.date.value; if(!val){ toast("Nhập giá trị hiện tại"); return; }
     v.valuations=[...(v.valuations||[]).filter(x=>x.date!==date),{id:newId(),date,value:val}];
-    render(); await write("investments/"+v.id,v);
+    S.openDep.delete("val:"+v.id); render(); await write("investments/"+v.id,v);
     { const c=invCalc(v), w=[]; if(isFuture(date)) w.push(`Ngày ${dmy(date)} ở tương lai`);
       if(c.principal>0&&Math.abs(val/c.principal-1)>0.5) w.push(`Giá trị ${vnd(val)} chênh hơn 50% so với tiền gốc ${vnd(c.principal)}, kiểm tra lại số`);
       if(!(w.length&&warnToast(["Đã cập nhật giá trị",...w]))) toast("Đã cập nhật giá trị"); } return;
